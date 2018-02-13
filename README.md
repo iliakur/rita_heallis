@@ -8,7 +8,7 @@ This program is intended to help coordinate meetings between many people who use
 ## Installation
 Preferably inside some virtual/conda env, run this in a terminal:
 ```
-pip install
+pip install git+https://github.com/Copper-Head/rita_heallis.git
 ```
 
 ## Usage
