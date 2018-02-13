@@ -12,5 +12,4 @@ setup(
     entry_points='''
         [console_scripts]
         rita=rita_heallis:main
-    ''',
-)
+    ''')
