@@ -138,11 +138,6 @@ def init_availability(year, month, name):
     return table
 
 
-def parse_time(input_time: str):
-    # TODO: add some exception catching here?
-    return time(int(input_time))
-
-
 def parse_intervals(times_input: str):
     if times_input == 'never':
         return []

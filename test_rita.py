@@ -63,19 +63,6 @@ def test_help_requested():
         rita.help_requested({1: 2})
 
 
-def test_parse_time():
-    assert rita.parse_time("1") == time(1)
-
-    with pytest.raises(ValueError):
-        rita.parse_time("1.3")
-
-    with pytest.raises(ValueError) as exc_info:
-        rita.parse_time("44")
-
-    with pytest.raises(ValueError) as exc_info:
-        rita.parse_time("test")
-
-
 def test_parse_intervals():
     assert rita.parse_intervals('never') == []
 
