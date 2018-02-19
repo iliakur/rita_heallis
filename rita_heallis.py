@@ -1,9 +1,10 @@
 """Rita"""
 
 import os
-from functools import partial
+from functools import partial, singledispatch
 from datetime import time, datetime
 import calendar
+import re
 
 import pandas as pd
 import numpy as np
@@ -33,6 +34,21 @@ If you don't have a regular schedule on that day, ignore that part and fill out 
 """
 
 prompt_newline = partial(click.prompt, prompt_suffix="\n", value_proc=str.strip)
+
+
+@singledispatch
+def help_requested(response):
+    raise TypeError("Can't handle this type: {}".format(type(response)))
+
+
+@help_requested.register(bool)
+def bool_response(response):
+    return False
+
+
+@help_requested.register(str)
+def bool_response(response):
+    return bool(response and re.match("h(?:elp)?!?", response))
 
 
 def main():

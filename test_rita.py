@@ -3,6 +3,29 @@ import pytest
 import rita_heallis as rita
 
 
+def test_help_requested():
+    # standard inputs
+    assert rita.help_requested("help") == True
+    assert rita.help_requested("h") == True
+    assert rita.help_requested("help!") == True
+    assert rita.help_requested("") == False
+    assert rita.help_requested("bob") == False
+    # booleans should all be false
+    assert rita.help_requested(True) == False
+    assert rita.help_requested(False) == False
+    # edge cases
+    with pytest.raises(TypeError):
+        rita.help_requested(None)
+    with pytest.raises(TypeError):
+        rita.help_requested(0)
+    with pytest.raises(TypeError):
+        rita.help_requested(4.5)
+    with pytest.raises(TypeError):
+        rita.help_requested([1, 2])
+    with pytest.raises(TypeError):
+        rita.help_requested({1: 2})
+
+
 def test_parse_time():
     assert rita.parse_time("1") == time(1)
 
