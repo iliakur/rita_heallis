@@ -19,13 +19,25 @@ Most of them have default answers (in square brackets) that you can accept by ju
 If at any time you aren't sure how to answer, type "h" or "help" in the prompt.
 """
 INTERVAL_HELP = """
+You specify your availability either in time intervals or by typing "never" or "always".
 One interval is a pair of integers between 9 and 19 separated by a space.
-The second digit is not considered part the  time interval!
-You can specify as many intervals as you like separating them by spaces.
+Note that the second digit is when the availability ends!
+You can specify multiple intervals, separating them by spaces.
 
 E.g. this input
 9 13 14 19
 basically means you are free all day except a break between 1pm and 2pm.
+"""
+DATE_HELP = """
+You can provide multiple dates separated by spaces.
+"""
+PATTERNS_MSG = """
+That's the preliminaries out of the way, yay!
+In order to most efficiently record your availability, I will ask you for 'patterns' in your schedule.
+This captures timeslots that occur on multiple days.
+Subsequent patterns you provide will override earlier ones.
+For instance, right now I assume that every day of the month you are available: "{}".
+You can refine this by giving me more specific patterns.
 """
 
 prompt_newline = partial(click.prompt, prompt_suffix="\n", value_proc=str.strip)
@@ -71,46 +83,34 @@ def main():
         month = int(
             pause_for_help(
                 partial(prompt_newline, "Please enter a number for the month you'd like to plan."),
-                "What you'd expect: any integer between 1 and 12 should work."))
+                "What you'd expect: any integer between 1 and 12 should work ;)"))
 
     table = init_availability(today.year, month, name)
 
     free_by_default = confirm_yes("I will by default assume that you are free all day."
                                   " If you're generally more often busy all day, say no.")
-    default_pref = "always" if free_by_default else "never"
+    global_default = "always" if free_by_default else "never"
+    # makes more sense to have pattern default be the opposite from global
+    pattern_default = "never" if free_by_default else "always"
+    # we also need to update the table
+    if free_by_default:
+        table.loc[((ALL, ALL, ALL), ALL)] = 1
 
-    for day in DAYS:
-        click.echo("Ok, let's deal with {}.".format(day))
-        regular_times = parse_intervals(
+    click.echo(PATTERNS_MSG.format(global_default))
+
+    while confirm_yes('Would you like to enter a new pattern?'):
+        dates = parse_dates(
+            pause_for_help(
+                partial(prompt_newline, "What date(s) does this pattern apply?", default='All'),
+                DATE_HELP))
+        times = parse_intervals(
             pause_for_help(
                 partial(
                     prompt_newline,
-                    "What times are you usually free on {}s? ".format(day),
-                    default=default_pref), INTERVAL_HELP))
-        for start, end in regular_times:
-            table.loc[((ALL, slice(start, end - 1), day), ALL)] = 1
-
-        weekday_dates = table.loc[((ALL, ALL, day), ALL)].index.unique().levels[0]
-        weekday_options = " ".join(str(d) for d in weekday_dates)
-        exceptions = parse_exceptions(
-            pause_for_help(
-                partial(
-                    prompt_newline, ('Any exceptions to this? Type one of these numbers {}.'
-                                    ).format(weekday_options),
-                    default="None"), ("You can give more than one (separated by spaces).\n"
-                                      "just hit `Enter` to avoid selecting any.")))
-        for ex in exceptions:
-            # we have to reset the availability for that day
-            table.loc[((ex, ALL, ALL), ALL)] = 0
-            # TODO check if the date is valid!
-            ex_times = parse_intervals(
-                pause_for_help(
-                    partial(
-                        prompt_newline,
-                        "What times are you free on {}?".format(ex),
-                        default=default_pref), INTERVAL_HELP))
-            for start, end in ex_times:
-                table.loc[((ex, slice(start, end - 1), ALL), ALL)] = 1
+                    "What times are you free in this pattern?",
+                    default=pattern_default), INTERVAL_HELP))
+        for start, end in times:
+            table.loc[((dates, slice(start, end - 1), ALL), ALL)] = 1
 
     default_path = os.path.join(os.path.expanduser("~"), "{}_availability.csv".format(name))
     csv_path = pause_for_help(
