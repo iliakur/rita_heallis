@@ -41,15 +41,12 @@ def bool_response(response):
 
 def pause_for_help(prompt_func, help_message, out=click.echo):
     """Keeps asking user for response and printing help message if requested."""
-
     while True:
         response = prompt_func()
         if help_requested(response):
             out(help_message)
             continue
         return response
-
-    return callback
 
 
 def main():
