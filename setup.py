@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='rita_heallis',
-    version='0.1',
+    version='0.2',
     py_modules=['rita_heallis'],
     install_requires=[
         'Click',
