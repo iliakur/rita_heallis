@@ -65,6 +65,7 @@ def test_help_requested():
 
 def test_parse_intervals():
     assert rita.parse_intervals('never') == []
+    assert rita.parse_intervals('always') == [(9, 19)]
 
     with pytest.raises(rita.RitaInputError):
         rita.parse_intervals("1 2 3")

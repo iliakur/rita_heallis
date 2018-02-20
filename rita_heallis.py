@@ -148,6 +148,8 @@ def init_availability(year, month, name):
 def parse_intervals(times_input: str):
     if times_input == 'never':
         return []
+    if times_input == 'always':
+        return [(9, 19)]
     pairs = times_input.strip().split()
     if len(pairs) % 2 != 0:
         raise RitaInputError(
