@@ -15,11 +15,18 @@ DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 WELCOME_MSG = """Hi, I'm Rita.
 I'm here to help you let everyone know when you can make it to your meeting!
 To do so, I will ask you a couple of simple questions.
+Most of them have default answers (in square brackets) that you can accept by just hitting "Enter".
 If at any time you aren't sure how to answer, type "h" or "help" in the prompt.
 """
-INTERVAL_HELP = """One interval is a pair of integers between 9 and 19 separated by a space.
-The second digit is not part the interval!
-You can specify as many intervals as you like separating them by spaces."""
+INTERVAL_HELP = """
+One interval is a pair of integers between 9 and 19 separated by a space.
+The second digit is not considered part the  time interval!
+You can specify as many intervals as you like separating them by spaces.
+
+E.g. this input
+9 13 14 19
+basically means you are free all day except a break between 1pm and 2pm.
+"""
 
 prompt_newline = partial(click.prompt, prompt_suffix="\n", value_proc=str.strip)
 
