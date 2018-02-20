@@ -73,11 +73,12 @@ def test_parse_intervals():
     assert rita.parse_intervals("10 15 16 20") == [(10, 15), (16, 20)]
 
 
-def test_parse_exceptions():
-    assert rita.parse_exceptions("None") == []
+def test_parse_dates():
+    assert rita.parse_dates("None") == []
+    assert rita.parse_dates("All") == slice(None)
 
-    assert rita.parse_exceptions("1") == [1]
-    assert rita.parse_exceptions("1 22") == [1, 22]
+    assert rita.parse_dates("1") == [1]
+    assert rita.parse_dates("1 22") == [1, 22]
 
     with pytest.raises(ValueError):
-        rita.parse_exceptions("test")
+        rita.parse_dates("test")

@@ -156,10 +156,12 @@ def parse_intervals(times_input: str):
     return list(zip(time_pairs[::2], time_pairs[1::2]))
 
 
-def parse_exceptions(exceptions_input: str):
-    if exceptions_input == "None":
+def parse_dates(dates_input: str):
+    if dates_input == "None":
         return []
-    dates = exceptions_input.strip().split()
+    if dates_input == 'All':
+        return ALL
+    dates = dates_input.strip().split()
     return [int(d) for d in dates]
 
 
