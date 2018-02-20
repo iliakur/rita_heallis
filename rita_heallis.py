@@ -29,6 +29,7 @@ basically means you are free all day except a break between 1pm and 2pm.
 """
 
 prompt_newline = partial(click.prompt, prompt_suffix="\n", value_proc=str.strip)
+confirm_yes = partial(click.confirm, default=True)
 
 
 @singledispatch
@@ -65,16 +66,18 @@ def main():
 
     today = datetime.now()
     month = today.month + 1
-    if not click.confirm(
-            "We will check your availability for {}. Is that ok?".format(
-                calendar.month_name[month]),
-            default=True):
+    if not confirm_yes("We will check your availability for {}. Is that ok?".format(
+            calendar.month_name[month])):
         month = int(
             pause_for_help(
                 partial(prompt_newline, "Please enter a number for the month you'd like to plan."),
-                "What you'd expect: any number between 1 and 12 should work."))
+                "What you'd expect: any integer between 1 and 12 should work."))
 
     table = init_availability(today.year, month, name)
+
+    free_by_default = confirm_yes("I will by default assume that you are free all day."
+                                  " If you're generally more often busy all day, say no.")
+    default_pref = "always" if free_by_default else "never"
 
     for day in DAYS:
         click.echo("Ok, let's deal with {}.".format(day))
@@ -83,7 +86,7 @@ def main():
                 partial(
                     prompt_newline,
                     "What times are you usually free on {}s? ".format(day),
-                    default="never"), INTERVAL_HELP))
+                    default=default_pref), INTERVAL_HELP))
         for start, end in regular_times:
             table.loc[((ALL, slice(start, end - 1), day), ALL)] = 1
 
@@ -105,7 +108,7 @@ def main():
                     partial(
                         prompt_newline,
                         "What times are you free on {}?".format(ex),
-                        default="never"), INTERVAL_HELP))
+                        default=default_pref), INTERVAL_HELP))
             for start, end in ex_times:
                 table.loc[((ex, slice(start, end - 1), ALL), ALL)] = 1
 
