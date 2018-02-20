@@ -5,6 +5,7 @@ from functools import partial, singledispatch
 from datetime import time, datetime
 import calendar
 import re
+from itertools import chain
 
 import pandas as pd
 import numpy as np
@@ -30,6 +31,8 @@ basically means you are free all day except a break between 1pm and 2pm.
 """
 DATE_HELP = """
 You can provide multiple dates separated by spaces.
+You can also give ranges of dates in this format: `start-end`.
+E.g. "1-4" will result in dates 1, 2, 3, 4.
 """
 PATTERNS_MSG = """
 That's the preliminaries out of the way, yay!
@@ -164,7 +167,14 @@ def parse_dates(dates_input: str):
     if dates_input == 'All':
         return ALL
     dates = dates_input.strip().split()
-    return [int(d) for d in dates]
+    return list(chain.from_iterable(extract_dates(d) for d in dates))
+
+
+def extract_dates(date_in: str):
+    if '-' in date_in:
+        start, end = date_in.split("-")
+        return list(range(int(start), int(end) + 1))
+    return [int(date_in)]
 
 
 if __name__ == '__main__':

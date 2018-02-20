@@ -80,6 +80,12 @@ def test_parse_dates():
 
     assert rita.parse_dates("1") == [1]
     assert rita.parse_dates("1 22") == [1, 22]
+    assert rita.parse_dates("1-4 22") == [1, 2, 3, 4, 22]
 
     with pytest.raises(ValueError):
         rita.parse_dates("test")
+
+
+def test_extract_dates():
+    assert rita.extract_dates("1-4") == [1, 2, 3, 4]
+    assert rita.extract_dates("1") == [1]
